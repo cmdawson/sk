@@ -1,0 +1,93 @@
+/*! \mainpage An implementation of the Kitaev-Solovay algorithm
+
+The Kitaev-Solovay algorithm lets us efficiently approximate an arbitray single-qubit gate by a sequence of gates from a given <i>instruction set</i>. By instruction set we just mean a small set of universal single-qubit gates, for example the Hadamard gate 'H' and the &pi;/8 gate 'T'. The algorithm is described in detail in this <a href="http://www.arXiv.org/quant-ph/abs/">review article</a>.
+
+Source archive: <a href="http://www.physics.uq.edu.au/people/dawson/files/sk-0.1.tar.gz">sk-0.1.tar.gz</a>
+
+Win32 binary: <a href="http://www.physics.uq.edu.au/people/dawson/files/sk-0.1_w32.zip">sk-0.1_w32.zip</a>
+
+The sources have been successfully compiled with g++ 3.3.5 and with MS Visual C++ 7.1. The Win32 binary contains a pre-compiled version of the Python module which may or may not work on your system.
+
+To compile the Python module you'll need the latest <a href="http://www.boost.org">Boost C++ libraries</a>. Installing them is easier than it sounds.
+
+\section overview Overview
+
+The main part of the whole Solovay-Kitaev thing is the initial epsilon-net. This is encapsulated by the Net class which allows you generate, save and load nets, and of course, run the algorithm. The main idea behind it is to divide an SU(2) parameter space up into \e tiles. Each instruction sequence that is generated is associated with nearby tiles, and then when it's time to find an initial approximation to some operator \e U we just search through the sequences in \e U's tile.
+
+When generating a Net for the first time you need to provide a 'tile width'. The less instruction sequences in a tile the better so you don't want the tiles too big. On the otherhand you don't want the tiles too small otherwise it's possible that won't have any instruction sequences in it. One of the main problems with the current implementation is that it uses a stupid SU(2) paramaterization and choosing a good tile width is difficult, but see the TODO section below for details. 
+
+The examples should be enough to get started with, and the accompanying class documentation should be enough to go further.
+
+\section todo TODO
+
+If I were trying to improve this code, these are some of the things I'd do (in order of priority):
+
+- SU(2) can be parameterized by a 4D unit vector (t,x,y,z) such that
+\f$tI +ixX + iyY + izZ \f$. So the tiling is just division of \f$ R^4 \f$ into equally sized hypercubes. This is stupid because the intersection of the unit sphere with these hypercubes varies enormously so no matter what the tile width is choosen to be the amount of 'net points' associated with each tile also varies enormously. A much better idea would be to divide the unit 3-sphere up into equal areas using polar coordinates.
+
+- Currently every single net point is saved. And although the Net is clever enough to not follow something up by its inverse or exceed a gate's order it isn't clever enough to know things like \f$ HXH = Z\f$. The size of the Net's that are generated is enormous, so even saving and loading them can take a long time (on my aged laptop de-allocating the memory actually takes a few seconds). So whenever we add a Net point we could check to see that it doesn't duplicate an existing one, or even limit ourselves to one net points per tile or something. This means it would take a little longer to generate the nets, but the save / load routines that are already written so generation only needs to be done once.
+
+- I'm sure there is more.
+
+*/
+
+/*! \example example.cpp
+Demonstrates the process of creating a Net and using it to return approximations */
+ 
+/*! \example example.py
+This demonstrates usage of the python module. The wrapper functions around the C++ library allow you to use the scipy matrix type which can be quite convenient.*/ 
+
+
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+
+/* \page pytute Using the Python package
+The package name is called <i>sk</i> and it contains the modules <i>net</i>, <i>utils</i>, and <i>common</i>. The main one is <i>net</i> which is a wrapping of the C++ Net class. <i>utils</i> just provides some simple routines to do things like generate a random SU(2) matrix and calculate the projective norm between two matrices. <i>common</i> defines some common universal gate sets which you might like to add to. Once you've imported them you can call \a help(module_name) to learn more. 
+
+The first thing that you'll normally want to do is initialize a \a net. To start one from scratch you must provide a Python dictionary whose keys are the uppercase characters used to label each gate, and the values being a Scipy matrix for the gate.
+
+It's not necessary to explicitly include inverses, they will be added for you if necessary. Inverses are labelled with lower case letters.
+
+For example
+\code
+from sk import net, utils
+from scipy import mat
+
+H = [ [1j/sqrt(2), 1j/sqrt(2)], [1j/sqrt(2), -1j/sqrt(2)] ]
+T = [ [cos(pi/8)-sin(pi/8)*1j, 0], [0, cos(pi/8)+sin(pi/8)*1j] ]
+
+gateset = { 'H' : mat(H), 'T' : mat(T) }
+\endcode
+
+Next you must instanciate the \a net. The constructor requires a number called the 'tile width' which determines the size of the cells SU(2) is divided into. The bigger the Net you're generating the smaller the tile width can be, but if it's too small then lookups to the net might occassionally fail (something should be done about this). Anyway, 0.15 is as good a number as any
+\code
+# Initialize the net with a tile width of 0.15
+N = net(0.15)
+\endcode
+
+Now this is done you can actually generate the net. This requires the \a gateset dictionary we defined above, and also a maximum sequence length to enumerate to. 
+\code
+# Generate the net up to a maximum sequence length of 12
+N.generate(gateset,12)
+\endcode
+
+If you're generating a big net you might want to go grab an espresso or something. Once that's done you can use it to look things up, evaluate sequences from the gate set and so on.
+\code
+# Fetch a random SU(2) matrix
+U = utils.random_su2()
+
+# This will return an approximating sequence from the gate set
+s = N.approximate(U)
+
+# Which you can evaluate to get a matrix that is close to either U or -U
+UA = N.evaluate(s)
+
+# To find out exactly how close use something like the projective distance 
+# function in utils
+d = utils.proj_dist(U,UA)
+\endcode
+*/
+
+
+

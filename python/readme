@@ -1,0 +1,34 @@
+--- CONTENTS ---
+
+In this directory you will find
+
+1) PyNet.h	
+This is a subclass of Net which provides some glue between the world of Python types and the world of C++ types
+
+2) wrapping.cpp
+The boost::python wrapping file which defines what classes / functions are going to be exposed to Python
+
+3) sk/
+Is a Python package directory. In here you will find __init__.py which modifies the Python net class on import so it can accept and return Scipy matrices. This also contains the files utils.py and common.py which define some useful routines and gate sets. After you have compiled the C++ wrapper library sk_base.so (or sk_base.dll) it needs to be placed in this directory
+
+4) Jamfile, Jamrules, and boost-build.jam are Boost configuration files. boost-build will need to be edited to point to your Boost installation directory.
+
+5) example.py (an example)
+
+
+--- INSTALLATION ---
+
+Download and install the Boost C++ libraries from http://www.boost.org (this is easier than it sounds). Make sure you get the latest version
+
+Boost provides a replacement for make called 'bjam' which you should place in your path somewhere. Edit the boost-build.jam file in this directory to point to whereever you installed Boost, and then take a look at the file Jamrules and Jamfile. Then run bjam.
+
+If all goes well you will find the library sk_base.so in the directory
+	bin/python/sk_base.so/g++/release/shared-linkable-true/.
+Or if you're on windows it will be sk_base.pyd in 
+	bin\python\sk_base.pyd\vc7\release\threading-multi\
+
+Copy this file into the directory sk.
+
+You should now be able to run the example script.
+
+Chris (dawson@physics.uq.edu.au)

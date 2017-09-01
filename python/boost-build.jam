@@ -1,0 +1,7 @@
+# Specify path to the boost build system
+
+BOOST_ROOT = E:\\Boost\\boost_1_32_0 ;
+# BOOST_ROOT = /home/chris/code/libraries/boost_1_31_0 ;
+
+boost-build $(BOOST_ROOT)/tools/build/v1 ;
+

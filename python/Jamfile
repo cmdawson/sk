@@ -1,0 +1,18 @@
+project-root ;
+
+project boost : $(BOOST_ROOT) ;
+
+SEARCH on python.jam = $(BOOST_BUILD_PATH) ;
+include python.jam ;
+
+extension sk_base
+:
+	wrapper.cpp
+	$(SRCS)/Net.cpp
+	$(SRCS)/su2.cpp
+:
+	<vc7><*><find-library>E:\\Boost\\lib\\boost_python-vc7-mt
+	# <gcc><*><find-library>boost_python #-gcc-1_31
+	<include>$(INCS)
+	<release><optimization><speed>
+;

@@ -1,0 +1,12 @@
+# edit these for your system
+path-global PYTHON_ROOT : E:\\Python23 ;
+# path-global PYTHON_ROOT : /usr ;
+path-global PYTHON_VERSION : 2.3 ;
+
+# TOOLS = gcc ;
+TOOLS = vc7 ;
+
+BUILD = release ;
+
+SRCS = ../src ;
+INCS = ../include ;
