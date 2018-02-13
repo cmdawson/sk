@@ -2,7 +2,7 @@
 This is a C++ implementation of the Solovay-Kitaev algorithm, a review of which can be found at
 [quant-ph/0505030](https://arxiv.org/abs/quant-ph/0505030)
 
-It has been superseded by all manner of implementations, see for example [here](https://arxiv.org/abs/1510.03888), and is available here for historical and pedagogical purposes, as well as proof that I once documented my code. 
+It has been superseded by all manner of implementations (see for example [here](https://arxiv.org/abs/1510.03888)), and is available here for historical and pedagogical purposes, as well as proof that I once documented my code. 
 
 ---
 
